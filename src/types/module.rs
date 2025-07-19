@@ -93,6 +93,29 @@ impl PyModule {
         }
     }
 
+    /// Reloads the module.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use pyo3::prelude::*;
+    ///
+    /// Python::attach(|py| {
+    ///     let module = PyModule::import(py, "antigravity").expect("No flying for you.");
+    ///     PyModule::reload(py, &module).expect("Failed to reload module");
+    /// });
+    /// ```
+    pub fn reload<'py>(
+        py: Python<'py>,
+        module: &Bound<'py, PyModule>,
+    ) -> PyResult<Bound<'py, PyModule>> {
+        unsafe {
+            ffi::PyImport_ReloadModule(module.as_ptr())
+                .assume_owned_or_err(py)
+                .downcast_into_unchecked()
+        }
+    }
+
     /// Creates and loads a module named `module_name`,
     /// containing the Python code passed to `code`
     /// and pretending to live at `file_name`.
